@@ -1,0 +1,26 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+@supports (scrollbar-gutter: stable) {
+  body {
+    padding-right: 0 !important;
+  }
+}
+
+#root {
+  min-height: 100dvh;
+}
+a {
+  color: inherit;
+}
