@@ -17,6 +17,8 @@ const CompanyLayout = lazy(() => import('./companies/CompanyLayout'))
 const CompanyOverview = lazy(() => import('./companies/CompanyOverview'))
 const EmployeesPage = lazy(() => import('./employees/EmployeesPage'))
 const ProjectsPage = lazy(() => import('./projects/ProjectsPage'))
+const ProjectPage = lazy(() => import('./projects/ProjectPage'))
+const AccessPage = lazy(() => import('./companies/AccessPage'))
 export default function App() {
   const session = useSession()
   return <ThemeProvider theme={theme}><CssBaseline /><QueryClientProvider client={queryClient}><NotifyProvider>
@@ -29,6 +31,8 @@ export default function App() {
             <Route index element={<CompanyOverview />} />
             <Route path="employees" element={<EmployeesPage />} />
             <Route path="projects" element={<ProjectsPage />} />
+            <Route path="projects/:projectId" element={<ProjectPage />} />
+            <Route path="access" element={<AccessPage />} />
           </Route>
         </Route>
         <Route path="*" element={<Navigate to="/companies" replace />} />
