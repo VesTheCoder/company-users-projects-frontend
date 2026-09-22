@@ -11,6 +11,13 @@ body {
 html {
   scrollbar-gutter: stable;
 }
+
+@supports (scrollbar-gutter: stable) {
+  body {
+    padding-right: 0 !important;
+  }
+}
+
 #root {
   min-height: 100dvh;
 }
