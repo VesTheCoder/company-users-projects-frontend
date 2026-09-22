@@ -25,3 +25,6 @@ dist-ssr
 
 # Env file
 .env
+test-results/
+playwright-report/
+.firecrawl/
