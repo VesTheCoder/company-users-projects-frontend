@@ -6,6 +6,7 @@ A React + TypeScript frontend for the Company Management API.
 
 Use Node.js 24 and npm. The backend must be running at http://localhost:8080.
 Create `.env.local` from `.env.local.sample`. Then run:
+
 ```powershell
 npm install
 npm run dev
@@ -14,10 +15,12 @@ npm run dev
 Open **http://localhost:5173**. Remember that to use other port, you need to re-configure backend CORS/CSRF checks.
 
 After the backend's demo seed, sign in with
+
 ```text
 Email: owner@demo.example
 Password: demo-password-123
 ```
+
 Demo accounts also include `admin@demo.example`, `viewer@demo.example` and `outsider@demo.example`. Same demo pasword for all of them. These are development fixtures only. Account creation and password resets are backend admin operations within the scope of operations managed by company.
 
 ## Features
