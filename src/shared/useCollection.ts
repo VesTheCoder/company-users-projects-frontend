@@ -12,12 +12,13 @@ export function useCollection<T>(
     getNextPageParam: (page) => page.next_cursor ?? undefined,
     gcTime: 0,
   })
+  const items = query.data?.pages.flatMap((page) => page.items) ?? []
   return {
-    items: query.data?.pages.flatMap((page) => page.items) ?? [],
+    items,
     props: {
       pending: query.isPending,
       error: query.error,
-      count: query.data?.pages.reduce((count, page) => count + page.items.length, 0) ?? 0,
+      count: items.length,
       fetching: query.isFetching,
       hasNext: query.hasNextPage,
       loadMore: () => {

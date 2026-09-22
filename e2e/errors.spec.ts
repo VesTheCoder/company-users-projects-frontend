@@ -118,3 +118,68 @@ test('renders 422 field errors inline', async ({ page }) => {
   await expect(page.getByText('Invalid company name')).toBeVisible()
   await expect(page.getByLabel('Company name')).toHaveAttribute('aria-invalid', 'true')
 })
+
+test('saving an employee refreshes each loaded page once and keeps rows visible', async ({
+  page,
+}) => {
+  await mockSession(page)
+  const employee = {
+    id: 'e1',
+    company_id: 'c',
+    full_name: 'First employee',
+    work_email: null,
+    work_phone: null,
+    job_title: null,
+    status: 'active',
+    start_date: '2026-01-01',
+    end_date: null,
+    version: 1,
+  }
+  let updated = false
+  let releaseRefresh!: () => void
+  const refreshGate = new Promise<void>((resolve) => {
+    releaseRefresh = resolve
+  })
+  const refreshedCursors: (string | null)[] = []
+  await page.route('**/api/v1/companies/c/employees/e1', (route) => {
+    if (route.request().method() === 'PATCH') updated = true
+    return route.fulfill({
+      json: { ...employee, job_title: updated ? 'Engineer' : null },
+      headers: { ETag: updated ? '"v2"' : '"v1"' },
+    })
+  })
+  await page.route('**/api/v1/companies/c/employees?*', async (route) => {
+    const cursor = new URL(route.request().url()).searchParams.get('cursor')
+    if (updated) {
+      refreshedCursors.push(cursor)
+      await refreshGate
+    }
+    await route.fulfill({
+      json: {
+        items: cursor
+          ? [{ ...employee, id: 'e2', full_name: 'Second employee' }]
+          : [{ ...employee, job_title: updated ? 'Engineer' : null }],
+        next_cursor: cursor ? null : updated ? 'fresh-cursor' : 'old-cursor',
+      },
+    })
+  })
+  try {
+    await page.goto('/companies/c/employees')
+    await page.getByRole('button', { name: 'Load more' }).click()
+    await expect(page.getByRole('heading', { name: 'Second employee' })).toBeVisible()
+    await page.getByRole('button', { name: 'Edit First employee', exact: true }).click()
+    await page.getByLabel('Job title').fill('Engineer')
+    await page.getByRole('button', { name: 'Save', exact: true }).click()
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+    await expect.poll(() => refreshedCursors.length).toBe(1)
+    await expect(page.getByRole('heading', { name: 'First employee' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Second employee' })).toBeVisible()
+    releaseRefresh()
+    await expect(page.getByText('Engineer', { exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Refresh', exact: true })).toBeEnabled()
+    expect(refreshedCursors).toEqual([null, 'fresh-cursor'])
+    await expect(page.getByText('2 loaded', { exact: true })).toBeVisible()
+  } finally {
+    releaseRefresh()
+  }
+})

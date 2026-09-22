@@ -21,16 +21,17 @@ function clear() {
   publish({ status: 'anonymous', user: null })
 }
 api.setUnauthorizedHandler(clear)
+function subscribe(listener: () => void) {
+  listeners.add(listener)
+  return () => {
+    listeners.delete(listener)
+  }
+}
+function getSnapshot() {
+  return session
+}
 export function useSession() {
-  return useSyncExternalStore(
-    (listener) => {
-      listeners.add(listener)
-      return () => {
-        listeners.delete(listener)
-      }
-    },
-    () => session,
-  )
+  return useSyncExternalStore(subscribe, getSnapshot)
 }
 let restoring: Promise<void> | null = null
 export function restoreSession() {

@@ -40,7 +40,6 @@ export default function ProjectPage() {
     setAssigning(false)
     setRemoving(null)
     notify('Project assignments updated.')
-    list.props.reload()
     void refreshCompany(company.id)
   }
   return (

@@ -114,7 +114,6 @@ export default function EmployeesPage() {
           onSuccess={() => {
             setAction(null)
             notify(action.remove ? 'Employee deleted.' : 'Employee saved.')
-            list.props.reload()
             void refreshCompany(company.id)
           }}
         />

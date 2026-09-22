@@ -113,7 +113,6 @@ export default function ProjectsPage() {
           onSuccess={() => {
             setAction(null)
             notify(action.remove ? 'Project deleted.' : 'Project saved.')
-            list.props.reload()
             void refreshCompany(company.id)
           }}
         />

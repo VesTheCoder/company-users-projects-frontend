@@ -27,7 +27,6 @@ export default function AccessPage() {
   const changed = () => {
     setAction(null)
     notify('Company access updated.')
-    list.props.reload()
     void refreshCompany(company.id)
   }
   if (company.current_role !== 'owner') return null

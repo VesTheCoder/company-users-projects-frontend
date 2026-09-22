@@ -6,10 +6,10 @@ export const queryClient = new QueryClient({
   },
 })
 export async function refreshCompany(companyId?: string) {
-  await queryClient.cancelQueries({ queryKey: ['companies'] })
-  await queryClient.resetQueries({ queryKey: ['companies'] })
+  const refreshes = [queryClient.resetQueries({ queryKey: ['companies'] })]
   if (companyId) {
     await queryClient.cancelQueries({ queryKey: ['company', companyId] })
-    await queryClient.invalidateQueries({ queryKey: ['company', companyId] })
+    refreshes.push(queryClient.invalidateQueries({ queryKey: ['company', companyId] }))
   }
+  await Promise.all(refreshes)
 }
