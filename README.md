@@ -1,44 +1,32 @@
 # Company Management
 
-A React + TypeScript frontend for the sibling Company Management API. Material UI provides a restrained light theme, React Router provides deep links, and TanStack Query manages server data.
+A React + TypeScript frontend for the Company Management API.
 
 ## Run locally
 
 Use Node.js 24 and npm. The backend must be running at http://localhost:8080.
-
+Create `.env.local` from `.env.local.sample`. Then run:
 ```powershell
 npm install
-Copy-Item .env.local.sample .env.local
 npm run dev
 ```
 
-Open **http://localhost:5173**. Vite uses a strict port so an unexpected port cannot silently break backend CORS/CSRF checks.
+Open **http://localhost:5173**. Remember that to use other port, you need to re-configure backend CORS/CSRF checks.
 
-The local configuration is:
-
-```dotenv
-VITE_API_BASE_URL=http://localhost:8080
-```
-
-Use the origin only, without a trailing slash or /api/v1. Vite embeds this public value at build time. Restart Vite after changing it. No secrets belong in VITE_* variables.
-
-The backend must allow http://localhost:5173 in CORS_ALLOWED_ORIGINS and expose ETag. Its supplied development configuration already supports this. Use localhost consistently rather than mixing localhost and 127.0.0.1.
-
-After the backend's demo seed, sign in with owner@demo.example and the documented demo password demo-password-123. Demo accounts also include admin@demo.example, viewer@demo.example and outsider@demo.example. These are development fixtures only. Account creation and password resets remain backend CLI operations.
+After the backend's demo seed, sign in with `owner@demo.example` and a demo password `demo-password-123`. Demo accounts also include `admin@demo.example`, `viewer@demo.example` and `outsider@demo.example`. Same demo pasword for all of them. These are development fixtures only. Account creation and password resets are backend admin operations within the scope of operations managed by company.
 
 ## Features
 
 - Cookie login, in-memory CSRF, session restoration and logout.
 - Company CRUD, role filtering and cursor pagination.
 - Employee CRUD, employment status filtering, date/email/phone validation.
-- Project CRUD, status filtering and allowed lifecycle transitions.
+- Project CRUD, status filtering and project lifecycle transitions.
 - Paginated assignments and active employee selection; assign and remove employees.
-- Owner-only access grants by existing account UUID, role changes, revocation and ownership transfer.
-- Owner/admin/viewer controls derived from each company's current_role.
+- Role changes, ownership transfer and revocation.
 - Resource ETags for edits/deletes, explicit reload after concurrent modifications, field-level validation and Problem Details handling.
-- Loading, empty, error and success states; confirmation dialogs; responsive layouts and keyboard-accessible Material UI controls.
+- Loading, empty, error and success states; confirmation dialogs; responsive layouts and Material UI controls.
 
-All collections use a 25-record cursor page and Load more. Changing the company or filter starts a new list. Mutations refresh the affected data. Reads consume AbortSignal; tenant/filter query keys isolate out-of-order responses. Logout and 401 responses clear session and cached data.
+All collections use a 25-record cursor page and "Load more" button. Changing the company or filter starts a new list. Mutations refresh the affected data. Reads consume AbortSignal; tenant/filter query keys isolate out-of-order responses. Logout and 401 responses clear session and cached data.
 
 ## Checks
 
@@ -47,10 +35,9 @@ npm run lint
 npm run format:check
 npm test
 npm run build
-npm run test:watch
 ```
 
-Unit/component tests are colocated under src. They cover API headers, 204 responses, session invalidation, ETags, form validation, stale edit recovery, domain rules and pagination.
+Unit/component tests cover API headers, 204 responses, session invalidation, ETags, form validation, stale edit recovery, domain rules and pagination.
 
 Browser tests use Chromium:
 
@@ -98,12 +85,6 @@ docker run --rm -p 5173:8080 company-management-frontend
 | e2e           | Mocked browser regression tests and live integration journey                     |
 | docker        | Nginx SPA configuration                                                          |
 
-The backend's docs/openapi.json is the contract source. TypeScript models and endpoint functions mirror it; recheck them whenever the backend changes. API types are maintained explicitly rather than generated.
+The backend's docs/openapi.json is the contract source. TypeScript models and endpoint functions mirror it; recheck them whenever the backend changes.
 
 Design and implementation references: [Material UI fields](https://mui.com/material-ui/react-text-field/), [TanStack infinite queries](https://tanstack.com/query/latest/docs/framework/react/guides/infinite-queries), and [AGENTS.md guidance](https://agents.md/).
-
-## Boundaries
-
-There is no user directory or account provisioning UI because the API does not expose those capabilities. Company employee records are not authentication accounts. The app does not load all records or calculate global totals. Closed projects retain existing assignments but cannot accept new ones. Server-side authorization remains authoritative if a role changes while a page is open.
-
-Production hosting needs HTTPS, secure session cookies and explicitly configured backend CORS/trusted origins. The included Compose configuration is for local development and demonstration.
