@@ -11,14 +11,27 @@ import Layout from './layout/Layout'
 import { theme } from './layout/theme'
 import { ErrorNotice, Loading } from './shared/Feedback'
 import { NotifyProvider } from './shared/Notify'
+import { lazy, Suspense } from 'react'
+const CompaniesPage = lazy(() => import('./companies/CompaniesPage'))
+const CompanyLayout = lazy(() => import('./companies/CompanyLayout'))
+const CompanyOverview = lazy(() => import('./companies/CompanyOverview'))
+const EmployeesPage = lazy(() => import('./employees/EmployeesPage'))
+const ProjectsPage = lazy(() => import('./projects/ProjectsPage'))
 export default function App() {
   const session = useSession()
   return <ThemeProvider theme={theme}><CssBaseline /><QueryClientProvider client={queryClient}><NotifyProvider>
     {session.status === 'loading' ? <Container><Loading label="Restoring your session…" /></Container> : session.status === 'error' ? <Container sx={{ py: 5 }}><ErrorNotice error={session.error} /><Button onClick={() => void restoreSession()}>Retry connection</Button></Container> :
-      <BrowserRouter><Routes>
+      <BrowserRouter><Suspense fallback={<Container><Loading /></Container>}><Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route element={<Layout />}><Route path="/companies" element={<p>Your companies will appear here.</p>} /></Route>
+        <Route element={<Layout />}>
+          <Route path="/companies" element={<CompaniesPage />} />
+          <Route path="/companies/:companyId" element={<CompanyLayout />}>
+            <Route index element={<CompanyOverview />} />
+            <Route path="employees" element={<EmployeesPage />} />
+            <Route path="projects" element={<ProjectsPage />} />
+          </Route>
+        </Route>
         <Route path="*" element={<Navigate to="/companies" replace />} />
-      </Routes></BrowserRouter>}
+      </Routes></Suspense></BrowserRouter>}
   </NotifyProvider></QueryClientProvider></ThemeProvider>
 }
