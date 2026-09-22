@@ -3,10 +3,17 @@ import { api } from '../api/client'
 import { ApiError } from '../api/errors'
 import { queryClient } from '../api/query'
 import type { LoginResponse, User } from '../api/types'
-type Session = { status: 'loading' | 'anonymous' | 'authenticated' | 'error'; user: User | null; error?: unknown }
+type Session = {
+  status: 'loading' | 'anonymous' | 'authenticated' | 'error'
+  user: User | null
+  error?: unknown
+}
 let session: Session = { status: 'loading', user: null }
 const listeners = new Set<() => void>()
-function publish(next: Session) { session = next; listeners.forEach(listener => listener()) }
+function publish(next: Session) {
+  session = next
+  listeners.forEach((listener) => listener())
+}
 function clear() {
   api.clearSession()
   void queryClient.cancelQueries()
@@ -15,7 +22,15 @@ function clear() {
 }
 api.setUnauthorizedHandler(clear)
 export function useSession() {
-  return useSyncExternalStore(listener => { listeners.add(listener); return () => { listeners.delete(listener) } }, () => session)
+  return useSyncExternalStore(
+    (listener) => {
+      listeners.add(listener)
+      return () => {
+        listeners.delete(listener)
+      }
+    },
+    () => session,
+  )
 }
 let restoring: Promise<void> | null = null
 export function restoreSession() {
@@ -30,14 +45,21 @@ export function restoreSession() {
       api.setCsrfToken(csrf.data.csrf_token)
       publish({ status: 'authenticated', user: user.data })
     } catch (error) {
-      if (error instanceof ApiError && error.status === 401 || session.status === 'anonymous') clear()
+      if ((error instanceof ApiError && error.status === 401) || session.status === 'anonymous')
+        clear()
       else publish({ status: 'error', user: null, error })
-    } finally { restoring = null }
+    } finally {
+      restoring = null
+    }
   })()
   return restoring
 }
 export async function signIn(login: string, password: string) {
-  const { data } = await api.request<LoginResponse>('/auth/login', { method: 'POST', login: true, body: { login, password } })
+  const { data } = await api.request<LoginResponse>('/auth/login', {
+    method: 'POST',
+    login: true,
+    body: { login, password },
+  })
   queryClient.clear()
   api.setCsrfToken(data.csrf_token)
   publish({ status: 'authenticated', user: { ...data.user, expires_at: data.expires_at } })

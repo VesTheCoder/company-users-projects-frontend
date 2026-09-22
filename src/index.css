@@ -8,6 +8,12 @@ body {
   margin: 0;
 }
 
-html { scrollbar-gutter: stable; }
-#root { min-height: 100dvh; }
-a { color: inherit; }
+html {
+  scrollbar-gutter: stable;
+}
+#root {
+  min-height: 100dvh;
+}
+a {
+  color: inherit;
+}

@@ -1,5 +1,13 @@
-interface FieldError { pointer: string; code: string; message: string }
-export interface Problem { detail?: string; code?: string; errors?: FieldError[] }
+interface FieldError {
+  pointer: string
+  code: string
+  message: string
+}
+export interface Problem {
+  detail?: string
+  code?: string
+  errors?: FieldError[]
+}
 const messages: Record<number, string> = {
   401: 'Your session has expired. Please sign in again.',
   403: 'You do not have permission to perform this action.',
@@ -22,7 +30,9 @@ export class ApiError extends Error {
     this.name = 'ApiError'
     this.status = status
     this.code = problem.code
-    this.fields = Object.fromEntries((problem.errors ?? []).map(e => [e.pointer.split('/')[1] || '_form', e.message]))
+    this.fields = Object.fromEntries(
+      (problem.errors ?? []).map((e) => [e.pointer.split('/')[1] || '_form', e.message]),
+    )
     this.retryAfter = retryAfter
   }
 }

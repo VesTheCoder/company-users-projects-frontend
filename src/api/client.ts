@@ -13,10 +13,19 @@ export class ApiClient {
   private onUnauthorized: () => void = () => {}
   private generation = 0
   private baseUrl: string
-  constructor(baseUrl: string) { this.baseUrl = baseUrl }
-  setUnauthorizedHandler(handler: () => void) { this.onUnauthorized = handler }
-  setCsrfToken(token: string) { this.csrfToken = token }
-  clearSession() { this.csrfToken = null; this.generation++ }
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl
+  }
+  setUnauthorizedHandler(handler: () => void) {
+    this.onUnauthorized = handler
+  }
+  setCsrfToken(token: string) {
+    this.csrfToken = token
+  }
+  clearSession() {
+    this.csrfToken = null
+    this.generation++
+  }
   async request<T>(path: string, options: RequestOptions = {}): Promise<Snapshot<T>> {
     const { method = 'GET', body, signal, etag, login } = options
     const generation = this.generation
@@ -31,23 +40,31 @@ export class ApiClient {
     let response: Response
     try {
       response = await fetch(this.baseUrl + '/api/v1' + path, {
-        method, headers, credentials: 'include', signal,
+        method,
+        headers,
+        credentials: 'include',
+        signal,
         body: body === undefined ? undefined : JSON.stringify(body),
       })
     } catch (error) {
       if (signal?.aborted) throw error
-      throw new Error('Unable to reach the server. Check your connection and try again.', { cause: error })
+      throw new Error('Unable to reach the server. Check your connection and try again.', {
+        cause: error,
+      })
     }
     if (generation !== this.generation) throw new DOMException('Session changed', 'AbortError')
     if (!response.ok) {
       const problem: Problem = await response.json().catch(() => ({}))
+      if (generation !== this.generation) throw new DOMException('Session changed', 'AbortError')
       if (response.status === 401 && !login) {
         this.clearSession()
         this.onUnauthorized()
       }
       throw new ApiError(response.status, problem, response.headers.get('Retry-After'))
     }
-    return { data: response.status === 204 ? undefined as T : await response.json() as T, etag: response.headers.get('ETag') }
+    const data = response.status === 204 ? (undefined as T) : ((await response.json()) as T)
+    if (generation !== this.generation) throw new DOMException('Session changed', 'AbortError')
+    return { data, etag: response.headers.get('ETag') }
   }
 }
 export const api = new ApiClient(import.meta.env.VITE_API_BASE_URL)

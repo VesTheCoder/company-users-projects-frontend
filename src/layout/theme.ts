@@ -1,11 +1,23 @@
 import { createTheme } from '@mui/material/styles'
-const colors = { ink: '#202020', secondary: '#606060', border: '#dedede', paper: '#ffffff', muted: '#f5f5f5' }
+const colors = {
+  ink: '#202020',
+  secondary: '#606060',
+  border: '#dedede',
+  paper: '#ffffff',
+  muted: '#f5f5f5',
+}
 export const theme = createTheme({
   palette: {
-    mode: 'light', primary: { main: colors.ink }, secondary: { main: colors.secondary },
+    mode: 'light',
+    primary: { main: colors.ink },
+    secondary: { main: colors.secondary },
     background: { default: colors.paper, paper: colors.paper },
-    text: { primary: colors.ink, secondary: colors.secondary }, divider: colors.border,
-    error: { main: '#454545' }, warning: { main: '#555555' }, info: { main: '#505050' }, success: { main: '#404040' },
+    text: { primary: colors.ink, secondary: colors.secondary },
+    divider: colors.border,
+    error: { main: '#454545' },
+    warning: { main: '#555555' },
+    info: { main: '#505050' },
+    success: { main: '#404040' },
   },
   typography: {
     fontFamily: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
@@ -20,6 +32,14 @@ export const theme = createTheme({
     MuiTextField: { defaultProps: { fullWidth: true, size: 'small' } },
     MuiTableCell: { styleOverrides: { head: { backgroundColor: colors.muted, fontWeight: 600 } } },
     MuiDialog: { defaultProps: { fullWidth: true, maxWidth: 'sm' } },
-    MuiAlert: { styleOverrides: { root: { backgroundColor: colors.muted, color: colors.ink, border: '1px solid ' + colors.border } } },
+    MuiAlert: {
+      styleOverrides: {
+        root: {
+          backgroundColor: colors.muted,
+          color: colors.ink,
+          border: '1px solid ' + colors.border,
+        },
+      },
+    },
   },
 })
